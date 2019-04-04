@@ -1,0 +1,74 @@
+
+\documentclass[12pt]{article}
+
+\usepackage{amsmath}    % need for subequations
+\usepackage{graphicx}   % need for figures
+\usepackage{verbatim}   % useful for program listings
+\usepackage{color}      % use if color is used in text
+\usepackage{subfigure}  % use for side-by-side figures
+\usepackage{hyperref}   % use for hypertext links, including those to external documents and URLs
+
+
+\setlength{\parskip}{3pt plus 2pt}
+\setlength{\parindent}{20pt}
+\setlength{\oddsidemargin}{0.5cm}
+\setlength{\evensidemargin}{0.5cm}
+\setlength{\marginparsep}{0.75cm}
+\setlength{\marginparwidth}{2.5cm}
+\setlength{\marginparpush}{1.0cm}
+\setlength{\textwidth}{150mm}
+
+\begin{comment}
+\pagestyle{empty} % use if page numbers not wanted
+\end{comment}
+
+% above is the preamble
+
+\begin{document}
+
+\begin{center}
+\large\textbf {Logistic Regression \\ using gmpy2 arithmetic }
+\end{center}
+
+\section{The model}
+
+The logistic regression model or (logit model) is a binary classificatin model in which the conditional probability is
+\begin{center}
+  $p(y_{i}=1|x_{i}) =  \dfrac{1}{1+e^{\beta_{0}+\sum_{i=1}^{N} \beta_{i}x_{i}}}$
+\end{center}
+where $(x_{i},y_{i}), i=1 \cdots N$ is the observed sample of data and $\beta_{i = 0 \cdots N}$ is the vector of parameters.We note $X=(x_{i})_{i=1 \cdot N}), Y=(y_{i})_{i=1 \cdot N})$.
+It is assumed that $y_{i}$ is a Bernouilli random variable. We he also
+\begin{center}
+  $p(y_{i}=0|x_{i}) = 1 - \dfrac{1}{1+e^{\beta_{0}+\sum_{i=1}^{N} \beta_{i}x_{i}}}$
+\end{center}
+The likelihood of the observed sample $(x_{i},y_{i}), i=1 \cdots N$ is
+\begin{center}
+  $L(X,Y,\beta) = \prod_{i=1}^{N}S(\beta.X)^{y_{i}}(1 - S(\beta.X))^{1-y_{i}}$
+  \\
+  $S(\beta.X)= \dfrac{1}{1+e^{\beta_{0}+\sum_{i=1}^{N} \beta_{i}x_{i}}}$
+\end{center}
+The log likelihood is
+\begin{center}
+  $l(X,Y,\beta) = \sum_{i=1}^{N} y_{i}\log S(\beta.X) + (1-y_{i}) \log(1 - S(\beta.X))$
+\end{center}
+The maximum likelihood estimator solves $\widehat{\beta} = \arg \max_{\beta} l(X,Y, \beta)$, it is obtained when it possible of solving equation
+\begin{center}
+  $\nabla_{\beta}l(X,Y,\beta) = 0$
+\end{center}
+The first order condition above has no explicit solution .  In most statistical software packages it is solved by using the the Newton-Raphson Technique. The method is pretty simple: we start from a guess of the solution $\widehat{\beta_{0}}$ , (e.g. $\widehat{\beta_{0}}=0$), and then we recursively update the guess with the equation
+\begin{center}
+  $\widehat{\beta_{n}} = \widehat{\beta_{n-1}} \nabla_{\beta\beta}l(X,Y,\widehat{\beta_{n-1})}^{-1} \nabla_{\beta}l(X,Y,\widehat{\beta_{n-1}})$
+\end{center}
+until numerical convergence (of $\widehat{\beta_{n}}$ to the solution $\widehat{\beta}$ ). Here we use the gmpy2 library for arbitrary-precision arithmetic.
+\section{Python computation}
+Our dataset is made up of a column $X$ of $100$ random integer in the range $[55000..78000]$, and a (boolean) column $Y$ of $100$ value.\\
+\begin{verbatim}
+import pandas as pd
+z ={'col1':np.random.randint(55000,78000,size =100),
+ 'col2':np.random.randint(2, size=100)} 
+pd.DataFrame(z).to_csv("data.csv") 
+\end{verbatim}
+We specialize the case of a vector of 2 parameter $\beta = \left[ \beta_{0},\beta_{1} \right]$.
+The file "newton.py" is the newton raphson method, it returns the vector $\beta$ solution, when starting from initial vector $[\beta_{0} = 15.1,\beta_{1}-0.4]$.
+The file "graph.py" plots graph of a function of two variable  "log likelihood" $l(X,Y,\beta)$ as function of $\beta$.
+\end{document}
