@@ -42,6 +42,7 @@ ax.set_xlabel('T_1 Axis')
 ax.set_ylabel('T_2 Axis')
 ax.set_zlabel('Z logLikelihood')
 
-plt.show()
+#plt.show()
+plt.savefig('foo.png')
 
 
